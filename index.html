@@ -13,14 +13,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
     <style id="app-styles">
-        /* Theme Variables */
+        /* Facebook / Meta Theme Variables */
         :root {
             --bg-color: #F0F2F5;
             --card-bg: #FFFFFF;
             --text-main: #050505;
             --text-muted: #65676B;
             --primary: #0866FF;
-            --primary-hover: #1877F2;
             --border: #CED0D4;
             --btn-gray: #E4E6EB;
             --divider: #E5E5E5;
@@ -33,7 +32,7 @@
             margin: 0;
             padding: 0;
             line-height: 1.5;
-            -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
+            -webkit-tap-highlight-color: transparent; /* Removes blue tap highlight on mobile */
         }
 
         /* Top Navigation Bar */
@@ -59,19 +58,10 @@
             gap: 10px;
         }
 
-        /* Replaced F icon with generic Analytics Icon */
-        .navbar-icon {
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-        }
+        .navbar-icon { color: var(--primary); display: flex; align-items: center; }
 
         /* Main Feed Layout */
-        .feed-container {
-            max-width: 680px; 
-            margin: 20px auto;
-            padding: 0 16px;
-        }
+        .feed-container { max-width: 680px; margin: 20px auto; padding: 0 16px; }
 
         /* Card (Post) Styling */
         .card {
@@ -82,131 +72,60 @@
             padding: 16px;
         }
 
-        /* Post Header */
-        .post-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-
+        /* Post Header (Profile Info) */
+        .post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        
         .profile-pic {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 16px;
-            flex-shrink: 0;
+            width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: bold; font-size: 16px; flex-shrink: 0;
         }
 
-        .post-meta h3 {
-            margin: 0;
-            font-size: 15px;
-            font-weight: 600;
-        }
+        .post-meta h3 { margin: 0; font-size: 15px; font-weight: 600; }
+        .post-meta span { font-size: 13px; color: var(--text-muted); }
 
-        .post-meta span {
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-
-        /* Create Post / Upload Section */
+        /* File Upload UI */
         .upload-input-mock {
-            background-color: var(--bg-color);
-            border-radius: 20px;
-            padding: 10px 16px;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: background 0.2s;
-            flex-grow: 1;
-            font-size: 15px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            background-color: var(--bg-color); border-radius: 20px;
+            padding: 10px 16px; color: var(--text-muted);
+            cursor: pointer; transition: background 0.2s;
+            flex-grow: 1; font-size: 15px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
 
         .upload-input-mock:hover { background-color: var(--btn-gray); }
         input[type="file"] { display: none; }
 
-        .divider {
-            height: 1px;
-            background-color: var(--divider);
-            margin: 12px 0;
-        }
+        .divider { height: 1px; background-color: var(--divider); margin: 12px 0; }
 
-        /* Buttons inside Post */
-        .post-actions {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap; /* Allows stacking on very small screens */
-        }
+        /* Buttons Area */
+        .post-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
         .btn {
-            flex: 1;
-            min-width: 140px; /* Ensures buttons don't get too squished on mobile */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-            color: var(--text-muted);
-            transition: background 0.2s;
-            border: none;
-            background: transparent;
+            flex: 1; min-width: 140px; display: flex; align-items: center; justify-content: center;
+            gap: 8px; padding: 10px; border-radius: 8px; cursor: pointer;
+            font-weight: 600; font-size: 14px; color: var(--text-muted);
+            transition: background 0.2s; border: none; background: transparent;
         }
 
         .btn:hover, .btn:active { background-color: var(--btn-gray); }
         .btn-primary { color: var(--primary); background-color: rgba(8, 102, 255, 0.05); }
 
-        /* Chart Area */
-        .chart-container {
-            position: relative;
-            height: 350px;
-            width: 100%;
-            margin-top: 10px;
-        }
-
-        /* Synthesis Box */
-        .synthesis-text {
-            font-size: 15px;
-            line-height: 1.5;
-            margin-bottom: 12px;
-            color: #1c1e21;
-        }
-
+        /* Chart & Text Elements */
+        .chart-container { position: relative; height: 350px; width: 100%; margin-top: 10px; }
+        .synthesis-text { font-size: 15px; line-height: 1.5; margin-bottom: 12px; color: #1c1e21; }
         #dashboard { display: none; }
 
         /* --- MOBILE RESPONSIVENESS --- */
         @media (max-width: 600px) {
-            .feed-container {
-                margin: 10px auto;
-                padding: 0 8px;
-            }
-            .card {
-                padding: 12px;
-                border-radius: 8px; /* Slightly tighter on mobile */
-            }
-            .chart-container {
-                height: 280px; /* Shorter charts for mobile viewing */
-            }
-            .post-meta h3 {
-                font-size: 14px;
-            }
-            .upload-input-mock {
-                font-size: 14px;
-                padding: 10px 12px;
-            }
+            .feed-container { margin: 10px auto; padding: 0 8px; }
+            .card { padding: 12px; border-radius: 8px; }
+            .chart-container { height: 280px; }
+            .post-meta h3 { font-size: 14px; }
+            .upload-input-mock { font-size: 14px; padding: 10px 12px; }
         }
 
-        /* --- PDF EXPORT OVERRIDES --- */
+        /* --- PDF EXPORT STYLES (Only active when generating PDF) --- */
         body.pdf-mode { background: white !important; }
         .pdf-mode .navbar, .pdf-mode #uploadCard { display: none !important; }
         .pdf-mode .feed-container { max-width: 1000px !important; margin: 0 !important; padding: 20px !important; }
@@ -265,9 +184,7 @@
                     </div>
                 </div>
                 <p class="synthesis-text" id="trendSynthesis"></p>
-                <div class="chart-container">
-                    <canvas id="trendChart"></canvas>
-                </div>
+                <div class="chart-container"><canvas id="trendChart"></canvas></div>
             </div>
 
             <div class="card">
@@ -279,9 +196,7 @@
                     </div>
                 </div>
                 <p class="synthesis-text" id="errorSynthesis"></p>
-                <div class="chart-container">
-                    <canvas id="errorChart"></canvas>
-                </div>
+                <div class="chart-container"><canvas id="errorChart"></canvas></div>
             </div>
 
             <div class="card">
@@ -293,36 +208,30 @@
                     </div>
                 </div>
                 <p class="synthesis-text" id="anomalySynthesis"></p>
-                <div class="chart-container" style="height: 250px;">
-                    <canvas id="anomalyChart"></canvas>
-                </div>
+                <div class="chart-container" style="height: 250px;"><canvas id="anomalyChart"></canvas></div>
             </div>
         </div>
     </div>
 
     <script id="app-logic">
         // ==========================================
-        // 1. PWA GENERATOR LOGIC (Runs Automatically)
+        // 1. INLINE PWA GENERATOR (NO EXTERNAL FILES NEEDED)
         // ==========================================
         (function initPWA() {
-            // Icon SVG to Data URI for Manifest
+            // Create App Icon inside memory
             const svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192"><rect width="192" height="192" rx="40" fill="#0866FF"/><path stroke="#fff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" d="M144 150V80M96 150V50M48 150v-40"/></svg>`;
             const iconUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgIcon);
 
-            // Generate Manifest dynamically
+            // Generate manifest.json inside memory and attach to <head>
             const manifest = {
-                name: "Analytics Feed",
-                short_name: "Analytics",
-                display: "standalone",
-                background_color: "#F0F2F5",
-                theme_color: "#0866FF",
-                start_url: location.href,
+                name: "Analytics Feed", short_name: "Analytics", display: "standalone",
+                background_color: "#F0F2F5", theme_color: "#0866FF", start_url: location.href,
                 icons: [{ src: iconUrl, sizes: "192x192", type: "image/svg+xml", purpose: "any maskable" }]
             };
             const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
             document.getElementById('manifest-placeholder').href = URL.createObjectURL(manifestBlob);
 
-            // Generate Service Worker dynamically for offline/installability
+            // Generate sw.js (Service Worker) inside memory and register it
             if ('serviceWorker' in navigator) {
                 const swCode = `
                     self.addEventListener('install', (e) => self.skipWaiting());
@@ -333,7 +242,7 @@
                 `;
                 const swBlob = new Blob([swCode], { type: 'text/javascript' });
                 navigator.serviceWorker.register(URL.createObjectURL(swBlob))
-                    .then(() => console.log("PWA Ready: Service Worker Registered"));
+                    .then(() => console.log("PWA Installed successfully!"));
             }
         })();
 
@@ -343,11 +252,12 @@
         let trendChartInstance = null;
         let errorChartInstance = null;
         let anomalyChartInstance = null;
-        let globalRawData = null;
+        let globalRawData = null; // Stores data for HTML Export
 
         Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
         Chart.defaults.color = '#65676B';
 
+        // Listen for File Upload
         const fileInput = document.getElementById('csvFileInput');
         if(fileInput) {
             fileInput.addEventListener('change', function(e) {
@@ -357,9 +267,7 @@
                 document.getElementById('uploadPlaceholder').innerHTML = `<b>Loaded:</b> ${file.name}`;
                 
                 Papa.parse(file, {
-                    header: true,
-                    dynamicTyping: true,
-                    skipEmptyLines: true,
+                    header: true, dynamicTyping: true, skipEmptyLines: true,
                     complete: function(results) {
                         globalRawData = results.data;
                         processDataAndRender(globalRawData);
@@ -370,6 +278,7 @@
             });
         }
 
+        // Process CSV Data and Calculate Stats
         function processDataAndRender(data) {
             const labels = [], actualData = [], forecastData = [], lowBandData = [], highBandData = [], errorData = [];
             let totalHistoryDays = 0, totalFutureDays = 0, anomalyCount = 0, validErrorCount = 0, totalErrorSum = 0;
@@ -408,6 +317,7 @@
             renderAnomalyChart(totalHistoryDays - anomalyCount, anomalyCount);
         }
 
+        // Generate Text Summaries
         function generateSynthesis(historyDays, futureDays, highestActual, anomalies, validErrors, totalErrorSum, highestError) {
             document.getElementById('trendSynthesis').innerHTML = `Dataset contains <b>${historyDays} historical records</b> and projects <b>${futureDays} days</b> into the future. Historically, the system peaked on ${highestActual.date} at a value of ${highestActual.val}.`;
             let averageError = validErrors > 0 ? (totalErrorSum / validErrors).toFixed(2) : 0;
@@ -416,6 +326,7 @@
             document.getElementById('anomalySynthesis').innerHTML = `Flagged <b>${anomalies} operational anomalies</b>, representing ${anomalyPercentage}% of the historical timeline. `;
         }
 
+        // Draw Charts
         function renderTrendChart(labels, actual, forecast, lowBand, highBand) {
             const ctx = document.getElementById('trendChart').getContext('2d');
             if (trendChartInstance) trendChartInstance.destroy();
@@ -477,19 +388,25 @@
         // 3. EXPORT FUNCTIONS
         // ==========================================
         function exportToPDF() {
-            document.body.classList.add('pdf-mode');
+            document.body.classList.add('pdf-mode'); // Applies special print CSS
             const element = document.body;
-            const opt = { margin: [0.5, 0.5, 0.5, 0.5], filename: 'Analytics_Feed.pdf', image: { type: 'jpeg', quality: 1.0 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } };
+            const opt = { 
+                margin: [0.5, 0.5, 0.5, 0.5], filename: 'Analytics_Feed.pdf', 
+                image: { type: 'jpeg', quality: 1.0 }, html2canvas: { scale: 2, useCORS: true }, 
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } 
+            };
             html2pdf().set(opt).from(element).save().then(() => document.body.classList.remove('pdf-mode'));
         }
 
         function exportToDynamicHTML() {
             if(!globalRawData) { alert("No data to export!"); return; }
+            
             const styleContent = document.getElementById('app-styles').innerHTML;
             const dashboardHTML = document.getElementById('dashboard').innerHTML;
             const scriptLogic = document.getElementById('app-logic').innerHTML;
-            const dataString = JSON.stringify(globalRawData);
+            const dataString = JSON.stringify(globalRawData); // Embed CSV data as JSON
 
+            // Construct entirely new HTML document
             const htmlContent = `
                 <!DOCTYPE html>
                 <html lang="en">
@@ -500,6 +417,7 @@
                     <script src="https://cdn.jsdelivr.net/npm/chart.js"><\/script>
                     <style>
                         ${styleContent}
+                        /* Hide the UI upload parts in the final export */
                         .navbar, #uploadCard { display: none !important; }
                         body { padding-top: 20px; }
                     </style>
@@ -510,6 +428,7 @@
                     </div>
                     <script>
                         ${scriptLogic}
+                        // Boot up the charts instantly using the embedded JSON data
                         const embeddedData = ${dataString};
                         processDataAndRender(embeddedData);
                     <\/script>
@@ -517,6 +436,7 @@
                 </html>
             `;
 
+            // Trigger download of the new HTML file
             const blob = new Blob([htmlContent], { type: 'text/html' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
