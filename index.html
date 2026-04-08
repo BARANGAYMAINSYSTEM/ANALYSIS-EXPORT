@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0866FF">
+    <title>Analytics Feed</title>
+    
+    <link rel="manifest" id="manifest-placeholder" href="">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <style id="app-styles">
+        /* Theme Variables */
+        :root {
+            --bg-color: #F0F2F5;
+            --card-bg: #FFFFFF;
+            --text-main: #050505;
+            --text-muted: #65676B;
+            --primary: #0866FF;
+            --primary-hover: #1877F2;
+            --border: #CED0D4;
+            --btn-gray: #E4E6EB;
+            --divider: #E5E5E5;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            line-height: 1.5;
+            -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
+        }
+
+        /* Top Navigation Bar */
+        .navbar {
+            background-color: var(--card-bg);
+            height: 56px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Replaced F icon with generic Analytics Icon */
+        .navbar-icon {
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+        }
+
+        /* Main Feed Layout */
+        .feed-container {
+            max-width: 680px; 
+            margin: 20px auto;
+            padding: 0 16px;
+        }
+
+        /* Card (Post) Styling */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            margin-bottom: 16px;
+            padding: 16px;
+        }
+
+        /* Post Header */
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .post-meta h3 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .post-meta span {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* Create Post / Upload Section */
+        .upload-input-mock {
+            background-color: var(--bg-color);
+            border-radius: 20px;
+            padding: 10px 16px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: background 0.2s;
+            flex-grow: 1;
+            font-size: 15px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .upload-input-mock:hover { background-color: var(--btn-gray); }
+        input[type="file"] { display: none; }
+
+        .divider {
+            height: 1px;
+            background-color: var(--divider);
+            margin: 12px 0;
+        }
+
+        /* Buttons inside Post */
+        .post-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap; /* Allows stacking on very small screens */
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 140px; /* Ensures buttons don't get too squished on mobile */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-muted);
+            transition: background 0.2s;
+            border: none;
+            background: transparent;
+        }
+
+        .btn:hover, .btn:active { background-color: var(--btn-gray); }
+        .btn-primary { color: var(--primary); background-color: rgba(8, 102, 255, 0.05); }
+
+        /* Chart Area */
+        .chart-container {
+            position: relative;
+            height: 350px;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        /* Synthesis Box */
+        .synthesis-text {
+            font-size: 15px;
+            line-height: 1.5;
+            margin-bottom: 12px;
+            color: #1c1e21;
+        }
+
+        #dashboard { display: none; }
+
+        /* --- MOBILE RESPONSIVENESS --- */
+        @media (max-width: 600px) {
+            .feed-container {
+                margin: 10px auto;
+                padding: 0 8px;
+            }
+            .card {
+                padding: 12px;
+                border-radius: 8px; /* Slightly tighter on mobile */
+            }
+            .chart-container {
+                height: 280px; /* Shorter charts for mobile viewing */
+            }
+            .post-meta h3 {
+                font-size: 14px;
+            }
+            .upload-input-mock {
+                font-size: 14px;
+                padding: 10px 12px;
+            }
+        }
+
+        /* --- PDF EXPORT OVERRIDES --- */
+        body.pdf-mode { background: white !important; }
+        .pdf-mode .navbar, .pdf-mode #uploadCard { display: none !important; }
+        .pdf-mode .feed-container { max-width: 1000px !important; margin: 0 !important; padding: 20px !important; }
+        .pdf-mode .card { box-shadow: none !important; border: 1px solid var(--divider) !important; page-break-inside: avoid; }
+    </style>
+</head>
+<body>
+
+    <div class="navbar" id="topNav">
+        <div class="navbar-brand">
+            <div class="navbar-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="20" x2="18" y2="10"></line>
+                    <line x1="12" y1="20" x2="12" y2="4"></line>
+                    <line x1="6" y1="20" x2="6" y2="14"></line>
+                </svg>
+            </div>
+            Analytics Feed
+        </div>
+    </div>
+
+    <div class="feed-container">
+        
+        <div class="card" id="uploadCard">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div class="profile-pic" style="background:var(--text-muted);">
+                    <svg width="20" height="20" fill="none" stroke="white" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                </div>
+                <label for="csvFileInput" class="upload-input-mock" id="uploadPlaceholder">
+                    Upload forecast CSV...
+                </label>
+                <input type="file" id="csvFileInput" accept=".csv">
+            </div>
+            
+            <div class="divider" id="actionDivider" style="display: none;"></div>
+            
+            <div class="post-actions" id="exportActions" style="display: none;">
+                <button class="btn btn-primary" onclick="exportToPDF()">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    Save as PDF
+                </button>
+                <button class="btn btn-primary" onclick="exportToDynamicHTML()">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                    Export HTML
+                </button>
+            </div>
+        </div>
+
+        <div id="dashboard">
+            <div class="card">
+                <div class="post-header">
+                    <div class="profile-pic" style="background:#0866FF;">📊</div>
+                    <div class="post-meta">
+                        <h3>Actual vs. Forecast Trend</h3>
+                        <span>Generated Just Now • Local Data</span>
+                    </div>
+                </div>
+                <p class="synthesis-text" id="trendSynthesis"></p>
+                <div class="chart-container">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="post-header">
+                    <div class="profile-pic" style="background:#E41E3F;">⚠️</div>
+                    <div class="post-meta">
+                        <h3>Absolute Percentage Error Tracking</h3>
+                        <span>Generated Just Now • Local Data</span>
+                    </div>
+                </div>
+                <p class="synthesis-text" id="errorSynthesis"></p>
+                <div class="chart-container">
+                    <canvas id="errorChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="post-header">
+                    <div class="profile-pic" style="background:#F5A623;">🔍</div>
+                    <div class="post-meta">
+                        <h3>Anomaly Detection Distribution</h3>
+                        <span>Generated Just Now • Local Data</span>
+                    </div>
+                </div>
+                <p class="synthesis-text" id="anomalySynthesis"></p>
+                <div class="chart-container" style="height: 250px;">
+                    <canvas id="anomalyChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script id="app-logic">
+        // ==========================================
+        // 1. PWA GENERATOR LOGIC (Runs Automatically)
+        // ==========================================
+        (function initPWA() {
+            // Icon SVG to Data URI for Manifest
+            const svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192"><rect width="192" height="192" rx="40" fill="#0866FF"/><path stroke="#fff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" d="M144 150V80M96 150V50M48 150v-40"/></svg>`;
+            const iconUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgIcon);
+
+            // Generate Manifest dynamically
+            const manifest = {
+                name: "Analytics Feed",
+                short_name: "Analytics",
+                display: "standalone",
+                background_color: "#F0F2F5",
+                theme_color: "#0866FF",
+                start_url: location.href,
+                icons: [{ src: iconUrl, sizes: "192x192", type: "image/svg+xml", purpose: "any maskable" }]
+            };
+            const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+            document.getElementById('manifest-placeholder').href = URL.createObjectURL(manifestBlob);
+
+            // Generate Service Worker dynamically for offline/installability
+            if ('serviceWorker' in navigator) {
+                const swCode = `
+                    self.addEventListener('install', (e) => self.skipWaiting());
+                    self.addEventListener('activate', (e) => self.clients.claim());
+                    self.addEventListener('fetch', (e) => {
+                        e.respondWith(fetch(e.request).catch(() => new Response('Offline mode.')));
+                    });
+                `;
+                const swBlob = new Blob([swCode], { type: 'text/javascript' });
+                navigator.serviceWorker.register(URL.createObjectURL(swBlob))
+                    .then(() => console.log("PWA Ready: Service Worker Registered"));
+            }
+        })();
+
+        // ==========================================
+        // 2. DASHBOARD & CHART LOGIC
+        // ==========================================
+        let trendChartInstance = null;
+        let errorChartInstance = null;
+        let anomalyChartInstance = null;
+        let globalRawData = null;
+
+        Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
+        Chart.defaults.color = '#65676B';
+
+        const fileInput = document.getElementById('csvFileInput');
+        if(fileInput) {
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                document.getElementById('uploadPlaceholder').innerHTML = `<b>Loaded:</b> ${file.name}`;
+                
+                Papa.parse(file, {
+                    header: true,
+                    dynamicTyping: true,
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        globalRawData = results.data;
+                        processDataAndRender(globalRawData);
+                        document.getElementById('actionDivider').style.display = 'block';
+                        document.getElementById('exportActions').style.display = 'flex';
+                    }
+                });
+            });
+        }
+
+        function processDataAndRender(data) {
+            const labels = [], actualData = [], forecastData = [], lowBandData = [], highBandData = [], errorData = [];
+            let totalHistoryDays = 0, totalFutureDays = 0, anomalyCount = 0, validErrorCount = 0, totalErrorSum = 0;
+            let highestActual = { date: '', val: -Infinity }, highestError = { date: '', val: -Infinity };
+
+            data.forEach(row => {
+                if (!row.Date) return; 
+                labels.push(row.Date);
+                
+                const actual = row.Actual !== null && row.Actual !== undefined && row.Actual !== "" ? Number(row.Actual) : null;
+                const forecast = row.Forecast ? Number(row.Forecast) : null;
+                const error = row.Absolute_Pct_Error !== null && row.Absolute_Pct_Error !== undefined && row.Absolute_Pct_Error !== "" ? Number(row.Absolute_Pct_Error) : null;
+                
+                actualData.push(actual); forecastData.push(forecast);
+                lowBandData.push(row.Low_Band ? Number(row.Low_Band) : null);
+                highBandData.push(row.High_Band ? Number(row.High_Band) : null);
+                errorData.push(error);
+
+                if (row.Type === 'History') {
+                    totalHistoryDays++;
+                    if (actual !== null && actual > highestActual.val) { highestActual = { date: row.Date, val: actual }; }
+                } else if (row.Type === 'Future') { totalFutureDays++; }
+
+                if (String(row.Is_Anomaly).toLowerCase() === 'true') { anomalyCount++; }
+                if (error !== null) {
+                    validErrorCount++; totalErrorSum += error;
+                    if (error > highestError.val) { highestError = { date: row.Date, val: error }; }
+                }
+            });
+
+            document.getElementById('dashboard').style.display = 'block';
+            generateSynthesis(totalHistoryDays, totalFutureDays, highestActual, anomalyCount, validErrorCount, totalErrorSum, highestError);
+
+            renderTrendChart(labels, actualData, forecastData, lowBandData, highBandData);
+            renderErrorChart(labels, errorData);
+            renderAnomalyChart(totalHistoryDays - anomalyCount, anomalyCount);
+        }
+
+        function generateSynthesis(historyDays, futureDays, highestActual, anomalies, validErrors, totalErrorSum, highestError) {
+            document.getElementById('trendSynthesis').innerHTML = `Dataset contains <b>${historyDays} historical records</b> and projects <b>${futureDays} days</b> into the future. Historically, the system peaked on ${highestActual.date} at a value of ${highestActual.val}.`;
+            let averageError = validErrors > 0 ? (totalErrorSum / validErrors).toFixed(2) : 0;
+            document.getElementById('errorSynthesis').innerHTML = `The Mean Absolute Percentage Error (MAPE) is <b>${averageError}%</b>. The most significant deviation occurred on ${highestError.date} with a spike of ${highestError.val.toFixed(2)}%.`;
+            let anomalyPercentage = ((anomalies / historyDays) * 100).toFixed(1);
+            document.getElementById('anomalySynthesis').innerHTML = `Flagged <b>${anomalies} operational anomalies</b>, representing ${anomalyPercentage}% of the historical timeline. `;
+        }
+
+        function renderTrendChart(labels, actual, forecast, lowBand, highBand) {
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            if (trendChartInstance) trendChartInstance.destroy();
+            trendChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Actual', data: actual, borderColor: '#0866FF', backgroundColor: 'rgba(8, 102, 255, 0.1)', borderWidth: 2, pointRadius: 2, fill: true, tension: 0.3 },
+                        { label: 'Forecast', data: forecast, borderColor: '#34A853', borderWidth: 2, borderDash: [5, 5], pointRadius: 0, fill: false, tension: 0.3 },
+                        { label: 'High Band', data: highBand, borderColor: '#CED0D4', borderWidth: 1, borderDash: [4, 4], pointRadius: 0, fill: false, tension: 0.3 },
+                        { label: 'Low Band', data: lowBand, borderColor: '#CED0D4', borderWidth: 1, borderDash: [4, 4], pointRadius: 0, fill: false, tension: 0.3 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: true },
+                    plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8 } } },
+                    scales: { y: { display: true, grid: { color: '#E5E5E5', drawBorder: false } }, x: { display: true, grid: { display: false } } }
+                }
+            });
+        }
+
+        function renderErrorChart(labels, errors) {
+            const ctx = document.getElementById('errorChart').getContext('2d');
+            if (errorChartInstance) errorChartInstance.destroy();
+            errorChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Error (%)', data: errors,
+                        backgroundColor: (ctx) => ctx.dataset.data[ctx.dataIndex] > 25 ? '#E41E3F' : '#0866FF',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, grid: { color: '#E5E5E5' } }, x: { grid: { display: false } } }
+                }
+            });
+        }
+
+        function renderAnomalyChart(normalCount, anomalyCount) {
+            const ctx = document.getElementById('anomalyChart').getContext('2d');
+            if (anomalyChartInstance) anomalyChartInstance.destroy();
+            anomalyChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Normal', 'Anomalies'],
+                    datasets: [{ data: [normalCount, anomalyCount], backgroundColor: ['#34A853', '#F5A623'], borderWidth: 0, hoverOffset: 4 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { usePointStyle: true } } }, cutout: '65%' }
+            });
+        }
+
+        // ==========================================
+        // 3. EXPORT FUNCTIONS
+        // ==========================================
+        function exportToPDF() {
+            document.body.classList.add('pdf-mode');
+            const element = document.body;
+            const opt = { margin: [0.5, 0.5, 0.5, 0.5], filename: 'Analytics_Feed.pdf', image: { type: 'jpeg', quality: 1.0 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } };
+            html2pdf().set(opt).from(element).save().then(() => document.body.classList.remove('pdf-mode'));
+        }
+
+        function exportToDynamicHTML() {
+            if(!globalRawData) { alert("No data to export!"); return; }
+            const styleContent = document.getElementById('app-styles').innerHTML;
+            const dashboardHTML = document.getElementById('dashboard').innerHTML;
+            const scriptLogic = document.getElementById('app-logic').innerHTML;
+            const dataString = JSON.stringify(globalRawData);
+
+            const htmlContent = `
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Dynamic Analytics Export</title>
+                    <script src="https://cdn.jsdelivr.net/npm/chart.js"><\/script>
+                    <style>
+                        ${styleContent}
+                        .navbar, #uploadCard { display: none !important; }
+                        body { padding-top: 20px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="feed-container">
+                        <div id="dashboard" style="display:block;">${dashboardHTML}</div>
+                    </div>
+                    <script>
+                        ${scriptLogic}
+                        const embeddedData = ${dataString};
+                        processDataAndRender(embeddedData);
+                    <\/script>
+                </body>
+                </html>
+            `;
+
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = 'Interactive_Analytics_Export.html';
+            a.click(); URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
